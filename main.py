@@ -11,11 +11,11 @@ app = Flask(__name__)
 @app.route('/canvas', methods=['GET'])
 def canvas_api():
     try:
-        access_token = request.headers.get('access_token')
+        access_token = request.headers.get('Authorization')
 
         if access_token is not None:
             headers = {
-                'Authorization': 'Bearer ' + access_token
+                'Authorization': access_token
             }
 
             query_params = request.args

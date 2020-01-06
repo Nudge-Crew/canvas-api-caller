@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
 import requests
-import json
 
 from werkzeug.datastructures import MultiDict
 
@@ -8,10 +7,10 @@ app = Flask(__name__)
 
 
 
-@app.route('/canvas', methods=['GET'])
-def canvas_api():
+@app.route('/canvas_api', methods=['GET'])
+def canvas_api(self):
     try:
-        access_token = request.headers.get('Authorization')
+        access_token = request.headers.get('X-Canvas-Authorization')
 
         if access_token is not None:
             headers = {

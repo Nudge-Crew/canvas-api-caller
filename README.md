@@ -43,13 +43,63 @@ Example environmental variables:
 In order to run flask, you just need to execute `flask run`.
 
 # Endpoints
-The only endpoint this function has is `/canvas`, here some parameters are expected.
+The only endpoint this function has is `/canvas_api`, here some parameters are expected.
 
 Headers:
-* Authorization - Canvas Authorization header / Access Token in Bearer format, as we need access to your Canvas courses.
+* Authorization - Reserved for Authorization headers for external use such as Google Functions or internal authentication.
+* X-Canvas-Authorization - Canvas Authorization header / Access Token in Bearer format, as we need access to your Canvas courses.
 
 Parameters;
 * Endpoint - Contains the endpoint to the canvas API url after `https://fhict.instructure.com/api/v1/`.
 * Canvas related parameters - Parameters expected by canvas itself such as `student_id`.
 
 This should work with most (if not all) canvas endpoints (GET) that use basic parameters.
+
+## Examples
+##### Without extra parameters
+```json
+GET { 
+  "endpoint": '/canvas_api',
+  "headers": {
+    "X-Canvas-Authorization": "Bearer {Canvas_Access_Token}"
+  },
+  "query": {
+    "endpoint": "courses",
+  }
+}
+```
+
+##### With extra parameters
+
+Query Parameters expected by Canvas API are also expected as a query parameter in this endpoint
+
+```json
+GET { 
+  "endpoint": '/canvas_api',
+  "headers": {
+    "X-Canvas-Authorization": "Bearer {Canvas_Access_Token}"
+  },
+  "query": {
+    "endpoint": "courses/5034/gradebook_history/days",
+    "student_id": "9047"
+  }
+}
+```
+
+##### With Secured Google Cloud Functions or external Authentication
+
+The `Authorization` token is used for Authorization from e.g Google Cloud Functions.
+
+```json
+GET { 
+  "endpoint": '/canvas_api',
+  "headers": {
+    "Authorization": "Bearer {Authorization_Token}",
+    "X-Canvas-Authorization": "Bearer {Canvas_Access_Token}"
+  },
+  "query": {
+    "endpoint": "courses/5034/gradebook_history/days",
+    "student_id": "9047"
+  }
+}
+```

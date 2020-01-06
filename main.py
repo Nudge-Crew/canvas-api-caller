@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 import requests
+import os
 
 from werkzeug.datastructures import MultiDict
 
@@ -38,7 +39,7 @@ def canvas_api(self):
                     array_params.add(k, query_params.get(k))
 
             url = requests.get(
-                'https://fhict.instructure.com/api/v1/' + endpoint,
+                os.environ.get('CANVAS_BASE_URL') + endpoint,
                 params=array_params,
                 headers=headers_canvas
             )
@@ -50,9 +51,9 @@ def canvas_api(self):
         else:
             return jsonify({
                 "message": "Access Token incorrect"
-            }), 200, headers
+            }), 401, headers
     except Exception as e:
         app.logger.error(e)
         return jsonify({
             "message": "Unable to call API"
-        }), 200, headers
+        }), 500, headers

@@ -53,6 +53,7 @@ def canvas_api(self):
 ```
 
 ## Run Flask
+set Environmental Variable `CANVAS_BASE_URL` to the canvas api environment e.g `https://fhict.test.instructure.com/api/v1/`
 In order to run flask, you just need to execute `flask run`.
 
 # Endpoints

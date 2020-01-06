@@ -39,6 +39,19 @@ Example environmental variables:
 
 ![Environmental Variables](https://i.imgur.com/2u3va11.png "Environmental Variables")
 
+## Google Cloud Functions
+Google cloud functions requires an extra parameter named `self` in the `canvas_api` method.
+When using Google Cloud Functions, in `main.py` change:
+```python
+def canvas_api():
+```
+
+to
+
+```python
+def canvas_api(self):
+```
+
 ## Run Flask
 In order to run flask, you just need to execute `flask run`.
 

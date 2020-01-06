@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 
 @app.route('/canvas_api', methods=['GET'])
-def canvas_api(self):
+def canvas_api():
     try:
         access_token = request.headers.get('X-Canvas-Authorization')
 

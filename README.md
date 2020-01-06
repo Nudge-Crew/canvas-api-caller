@@ -72,7 +72,7 @@ This should work with most (if not all) canvas endpoints (GET) that use basic pa
 ##### Without extra parameters
 ```json
 GET { 
-  "endpoint": '/canvas_api',
+  "endpoint": "/canvas_api",
   "headers": {
     "X-Canvas-Authorization": "Bearer {Canvas_Access_Token}"
   },
@@ -88,7 +88,7 @@ Query Parameters expected by Canvas API are also expected as a query parameter i
 
 ```json
 GET { 
-  "endpoint": '/canvas_api',
+  "endpoint": "/canvas_api",
   "headers": {
     "X-Canvas-Authorization": "Bearer {Canvas_Access_Token}"
   },
@@ -105,7 +105,7 @@ The `Authorization` token is used for Authorization from e.g Google Cloud Functi
 
 ```json
 GET { 
-  "endpoint": '/canvas_api',
+  "endpoint": "/canvas_api",
   "headers": {
     "Authorization": "Bearer {Authorization_Token}",
     "X-Canvas-Authorization": "Bearer {Canvas_Access_Token}"

@@ -6,7 +6,7 @@ from werkzeug.datastructures import MultiDict
 app = Flask(__name__)
 
 
-
+# Add "self" parameter when working with Google Cloud.
 @app.route('/canvas_api', methods=['GET'])
 def canvas_api():
     try:

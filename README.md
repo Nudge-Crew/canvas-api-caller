@@ -1,4 +1,4 @@
-# Installation Guide
+# Local Installation Guide
 ## Virtual Environment
 ### Linux and MacOS
 
@@ -54,10 +54,20 @@ def canvas_api(self):
 
 ## Run Flask
 set Environmental Variable `CANVAS_BASE_URL` to the canvas api environment e.g `https://fhict.test.instructure.com/api/v1/`
+
 In order to run flask, you just need to execute `flask run`.
 
-# Endpoints
-The only endpoint this function has is `/canvas_api`, here some parameters are expected.
+# Examples
+```python
+import canvas_api_caller
+
+def hello_world() {
+    canvas_api_caller.call
+}
+```
+
+
+
 
 Headers:
 * Authorization - Reserved for Authorization headers for external use such as Google Functions or internal authentication.

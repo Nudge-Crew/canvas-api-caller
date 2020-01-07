@@ -6,10 +6,10 @@ import os
 
 
 def call(access_token, endpoint, params):
-    if access_token and params.get('endpoint') is not None:
+    if access_token and endpoint is not None:
         try:
             headers = {
-                'Authorization': access_token
+                'Authorization': translate_access_token(access_token)
             }
 
             url = requests.get(
@@ -18,33 +18,28 @@ def call(access_token, endpoint, params):
                 headers=headers
             )
 
-            return json.dumps({
-                "code": url.status_code,
-                "url": url.url,
-                "message": url.json()
-            })
+            return format_json_to_string(url.json(), url.status_code, url.url)
         except Exception as e:
-            return json.dumps({
-                "code": 500,
-                "message": e,
-                "url": None
-            })
+            return format_json_to_string(e, 500, None)
     else:
         if access_token is None:
-            return json.dumps({
-                "message": "Access Token not found",
-                "code": 401,
-                "url": None
-            })
-        elif params.get('endpoint') is None:
-            return json.dumps({
-                "message": "Canvas Endpoint not specified",
-                "code": 404,
-                "url": None
-            })
+            return format_json_to_string("Access Token Not Found", 401, None)
+        elif endpoint is None:
+            return format_json_to_string("Canvas Endpoint not specified", 404, None)
         else:
-            return json.dumps({
-                "message": "Unable to call Canvas API",
-                "code": 500,
-                "url": None
-            })
+            return format_json_to_string("Unable to call Canvas API", 500, None)
+
+def translate_access_token(access_token):
+    prefix = 'Bearer'
+
+    if access_token.startswith(prefix) is False:
+        return '%s %s'% (prefix, access_token)
+    else:
+        return access_token
+
+def format_json_to_string(message, status_code, url):
+    return json.dumps({
+        "code": status_code,
+        "url": url,
+        "message": message
+    })

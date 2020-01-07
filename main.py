@@ -1,59 +1,55 @@
-from flask import Flask, jsonify, request
 import requests
+import json
 import os
 
-from werkzeug.datastructures import MultiDict
 
-app = Flask(__name__)
-
-
-# Add "self" parameter when working with Google Cloud.
-@app.route('/canvas_api', methods=['GET'])
-def canvas_api(self):
-    # Allows GET requests from any origin with the Content-Type
-    # header and caches preflight response for an 3600s
-    headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Headers': '*'
-    }
-
-    if request.method == 'OPTIONS':
-        return ('', 204, headers)
-
-    try:
-        access_token = request.headers.get('X-Canvas-Authorization')
-
-        if access_token is not None:
-            headers_canvas = {
-                'Authorization': access_token,
+def call(access_token, params):
+    if access_token and params.get('endpoint') is not None:
+        try:
+            headers = {
+                'Authorization': access_token
             }
 
-            query_params = request.args
-            endpoint = query_params.get('endpoint')
-            array_params = MultiDict()
+            endpoint = params.get('endpoint')
+            query_params = []
 
-            for k in query_params.keys():
-                app.logger.error("value: " + k + ' - ' + str(k != "endpoint"))
-                if k != 'endpoint':
-                    array_params.add(k, query_params.get(k))
+            for p in params.keys():
+                if p != 'endpoint':
+                    query_params.append([p, params.get(p)])
 
             url = requests.get(
                 os.environ.get('CANVAS_BASE_URL') + endpoint,
-                params=array_params,
-                headers=headers_canvas
+                params=query_params,
+                headers=headers
             )
 
-            return jsonify({
+            return json.dumps({
+                "code": url.status_code,
                 "url": url.url,
-                "message1": url.json()
-            }), 200, headers
+                "message": url.json()
+            })
+        except Exception as e:
+            return json.dumps({
+                "code": 500,
+                "message": e,
+                "url": None
+            })
+    else:
+        if access_token is None:
+            return json.dumps({
+                "message": "Access Token not found",
+                "code": 401,
+                "url": None
+            })
+        elif params.get('endpoint') is None:
+            return json.dumps({
+                "message": "Canvas Endpoint not specified",
+                "code": 404,
+                "url": None
+            })
         else:
-            return jsonify({
-                "message": "Access Token incorrect"
-            }), 401, headers
-    except Exception as e:
-        app.logger.error(e)
-        return jsonify({
-            "message": "Unable to call API"
-        }), 500, headers
+            return json.dumps({
+                "message": "Unable to call Canvas API",
+                "code": 500,
+                "url": None
+            })

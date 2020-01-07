@@ -35,7 +35,7 @@ to update the requirments folder
 Make sure to have python37 and python37\Scripts added in your environmental path.
 Else command such as ```virtualenv venv``` may not work.
 
-Example environmental variables:
+###### Example environmental variables:
 
 ![Environmental Variables](https://i.imgur.com/2u3va11.png "Environmental Variables")
 

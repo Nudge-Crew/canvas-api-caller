@@ -1,25 +1,20 @@
+from builtins import Exception
+
 import requests
 import json
 import os
 
 
-def call(access_token, params):
+def call(access_token, endpoint, params):
     if access_token and params.get('endpoint') is not None:
         try:
             headers = {
                 'Authorization': access_token
             }
 
-            endpoint = params.get('endpoint')
-            query_params = []
-
-            for p in params.keys():
-                if p != 'endpoint':
-                    query_params.append([p, params.get(p)])
-
             url = requests.get(
                 os.environ.get('CANVAS_BASE_URL') + endpoint,
-                params=query_params,
+                params=params,
                 headers=headers
             )
 

@@ -18,12 +18,17 @@ def main():
     return canvas.call('{BEARER_ACCESS_TOKEN}', '{CANVAS_ENDPOINT}', '{PARAM_OBJECT_OF_KEY_VALUES}')
 ```
 
-## Flask Example
+## HTTP wrapper with Flask
 The below code decides the canvas_api_caller call parameters through HTTP values.
 
 A custom HTTP header called `X-Canvas-Authorization` is used in the example below to pass the `BEARER_ACCESS_TOKEN` of Canvas.
 A Query Parameter called `endpoint` is used to access the `CANVAS_ENDPOINT` of canvas. 
 All other Query Parameters passed through will be used for the `PARAM_OBJECT_OF_KEY_VALUES`.
+
+Required packages:
+- Flask
+- Werkzeug
+
 ```python
 import canvas_api_caller as canvas
 from flask import Flask, jsonify, request, json
@@ -31,22 +36,30 @@ from werkzeug.datastructures import MultiDict
 
 app = Flask(__name__)
 
-@app.route('/canvas', methods=['GET'])
-def canvas():
-    access_token = request.headers.get('X-Canvas-Authorization')
-    query_params = request.args
-    endpoint = query_params.get('endpoint')
-    array_params = MultiDict()
+@app.route('/canvas_api', methods=['GET'])
+def canvas_api():
+    return canvas.http(request)
+```
 
-    for k in query_params.keys():
-        if k != 'endpoint':
-            array_params.add(k, query_params.get(k))
+### CORS Origin
+When required to adjust your headers for purposes such as CORS, you can additionally add your custom headers.
 
-    access_token = access_token.replace('Bearer ', '')
+```python
+import canvas_api_caller as canvas
+from flask import Flask, jsonify, request, json
+from werkzeug.datastructures import MultiDict
 
-    json_response = canvas.call(access_token, endpoint, array_params)
-    decoded_response = json.loads(json_response)
-    return jsonify({
-        "message": decoded_response['message']
-    }), decoded_response['code']
+app = Flask(__name__)
+
+@app.route('/canvas_api', methods=['GET'])
+def canvas_api():
+    # Allows GET requests from any origin with the Content-Type
+    # header and caches preflight response for an 3600s
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Headers': '*'
+    }
+
+    return canvas.http(request, headers)
 ```

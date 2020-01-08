@@ -1,129 +1,52 @@
-# Local Installation Guide
-## Virtual Environment
-### Linux and MacOS
+# Canvas API Caller
+Canvas API Caller is a small library that utilizes the Instructure Canvas API GET requests.
 
-The venv folder contains all dependencies which are needed to run this project. To enter the venv virtual environment use:
+# Installation Guide
+1. execute `pip install canvas-api-caller` or add `canvas-api-caller` to your `requirements.txt` file.
+2. Add an environment variable named `CANVAS_BASE_URL` with the url of the full canvas API, such as `https://mycompany.test.instructure.com/api/v1/`.
 
-``` source venv/bin/activate ```
-
-If this is the first time running or if anything in the requirements has changed use:
-
-``` virtualenv venv && source venv/bin/activate && pip install -r requirements.txt ```
-
-after installing a new package use: 
-
-``` pip freeze > requirements.txt ```
-
-to update the requirments folder
-
-### Windows
-The venv folder contains all dependencies which are needed to run this project. To enter the venv virtual environment use:
-
-``` source venv/bin/activate ```
-
-If this is the first time running or if anything in the requirements has changed use:
-
-``` virtualenv venv && source venv/Scripts/activate && pip install -r requirements.txt ```
-
-after installing a new package use: 
-
-``` pip freeze > requirements.txt ```
-
-to update the requirments folder
-
-#### Important Note
-Make sure to have python37 and python37\Scripts added in your environmental path.
-Else command such as ```virtualenv venv``` may not work.
-
-###### Example environmental variables:
-
-![Environmental Variables](https://i.imgur.com/2u3va11.png "Environmental Variables")
-
-## Google Cloud Functions
-Google cloud functions requires an extra parameter named `self` in the `canvas_api` method.
-When using Google Cloud Functions, in `main.py` change:
+# Code Examples
+## General Example
+The below code shows the general use of this library.
+`BEARER_ACCESS_TOKEN` is the access token expected by Canvas to authenticate and identify yourself to their API.
+`CANVAS_ENDPOINT` is used to call the endpoint you want to use.
+`PARAM_OBJECT_OF_KEY_VALUES` are used to pass parameters through to the Canvas API, as some endpoints require additional parameters such as `student_id`.
 ```python
-def canvas_api():
+import canvas_api_caller as canvas
+
+def main():
+    return canvas.call('{BEARER_ACCESS_TOKEN}', '{CANVAS_ENDPOINT}', '{PARAM_OBJECT_OF_KEY_VALUES}')
 ```
 
-to
+## Flask Example
+The below code decides the canvas_api_caller call parameters through HTTP values.
 
+A custom HTTP header called `X-Canvas-Authorization` is used in the example below to pass the `BEARER_ACCESS_TOKEN` of Canvas.
+A Query Parameter called `endpoint` is used to access the `CANVAS_ENDPOINT` of canvas. 
+All other Query Parameters passed through will be used for the `PARAM_OBJECT_OF_KEY_VALUES`.
 ```python
-def canvas_api(self):
-```
+import canvas_api_caller as canvas
+from flask import Flask, jsonify, request, json
+from werkzeug.datastructures import MultiDict
 
-## Run Flask
-set Environmental Variable `CANVAS_BASE_URL` to the canvas api environment e.g `https://fhict.test.instructure.com/api/v1/`
+app = Flask(__name__)
 
-In order to run flask, you just need to execute `flask run`.
+@app.route('/canvas', methods=['GET'])
+def canvas():
+    access_token = request.headers.get('X-Canvas-Authorization')
+    query_params = request.args
+    endpoint = query_params.get('endpoint')
+    array_params = MultiDict()
 
-# Examples
-```python
-import canvas_api_caller
+    for k in query_params.keys():
+        if k != 'endpoint':
+            array_params.add(k, query_params.get(k))
 
-def hello_world() {
-    canvas_api_caller.call
-}
-```
+    access_token = access_token.replace('Bearer ', '')
 
-
-
-
-Headers:
-* Authorization - Reserved for Authorization headers for external use such as Google Functions or internal authentication.
-* X-Canvas-Authorization - Canvas Authorization header / Access Token in Bearer format, as we need access to your Canvas courses.
-
-Parameters;
-* Endpoint - Contains the endpoint to the canvas API url after `https://fhict.instructure.com/api/v1/`.
-* Canvas related parameters - Parameters expected by canvas itself such as `student_id`.
-
-This should work with most (if not all) canvas endpoints (GET) that use basic parameters.
-
-## Examples
-##### Without extra parameters
-```json
-GET { 
-  "endpoint": "/canvas_api",
-  "headers": {
-    "X-Canvas-Authorization": "Bearer {Canvas_Access_Token}"
-  },
-  "query": {
-    "endpoint": "courses",
-  }
-}
-```
-
-##### With extra parameters
-
-Query Parameters expected by Canvas API are also expected as a query parameter in this endpoint
-
-```json
-GET { 
-  "endpoint": "/canvas_api",
-  "headers": {
-    "X-Canvas-Authorization": "Bearer {Canvas_Access_Token}"
-  },
-  "query": {
-    "endpoint": "courses/5034/gradebook_history/days",
-    "student_id": "9047"
-  }
-}
-```
-
-##### With Secured Google Cloud Functions or external Authentication
-
-The `Authorization` token is used for Authorization from e.g Google Cloud Functions.
-
-```json
-GET { 
-  "endpoint": "/canvas_api",
-  "headers": {
-    "Authorization": "Bearer {Authorization_Token}",
-    "X-Canvas-Authorization": "Bearer {Canvas_Access_Token}"
-  },
-  "query": {
-    "endpoint": "courses/5034/gradebook_history/days",
-    "student_id": "9047"
-  }
-}
+    json_response = canvas.call(access_token, endpoint, array_params)
+    decoded_response = json.loads(json_response)
+    return jsonify({
+        "message": decoded_response['message']
+    }), decoded_response['code']
 ```

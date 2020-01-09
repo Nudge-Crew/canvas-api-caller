@@ -43,6 +43,7 @@ def canvas_api():
 
 ### CORS Origin
 When required to adjust your headers for purposes such as CORS, you can additionally add your custom headers.
+When working with custom headers, make sure to have `Access-Control-Allow-Headers` specifiek and atleast `X-Canvas-Authorization` allowed.
 
 ```python
 import canvas_api_caller as canvas
@@ -58,7 +59,7 @@ def canvas_api():
     headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Headers': '*'
+        'Access-Control-Allow-Headers': 'X-Canvas-Authorization'
     }
 
     return canvas.http(request, headers)

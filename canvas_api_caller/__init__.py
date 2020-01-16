@@ -8,9 +8,11 @@ from flask import Flask, jsonify, json
 from werkzeug.datastructures import MultiDict
 
 
-def call(access_token, endpoint, params):
-    if os.environ.get('CANVAS_BASE_URL') is None:
-        return format_json_to_string("CANVAS_BASE_URL not set in environmental variable", 500)
+def call(access_token, endpoint, params=None):
+    default_canvas_base_url = 'https://fhict.test.instructure.com/api/v1/'
+
+    if params is None:
+        params = {}
 
     if access_token and endpoint is not None:
         try:
@@ -19,7 +21,7 @@ def call(access_token, endpoint, params):
             }
 
             url = requests.get(
-                os.environ.get('CANVAS_BASE_URL') + endpoint,
+                os.environ.get('CANVAS_BASE_URL', default_canvas_base_url) + endpoint,
                 params=params,
                 headers=headers
             )

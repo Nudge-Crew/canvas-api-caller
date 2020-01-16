@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='canvas_api_caller',
-    version='1.0.4',
+    version='1.0.7',
     url="https://github.com/Nudge-Crew/canvas-api-caller",
     author="Noah Scharrenberg",
     author_email="nscharrenberg@hotmail.com",
